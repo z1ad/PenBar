@@ -1,2 +1,5 @@
 # Per-machine positions and settings
 PenBar.ini
+
+# Build output
+dist/

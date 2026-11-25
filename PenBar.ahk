@@ -15,11 +15,31 @@
 
 #Requires AutoHotkey v2.0
 #SingleInstance Force
+
+;@Ahk2Exe-SetName PenBar
+;@Ahk2Exe-SetProductName PenBar
+;@Ahk2Exe-SetDescription PenBar - pen toolbar and handwriting pad
+;@Ahk2Exe-SetVersion 1.0.0
+;@Ahk2Exe-SetCopyright Copyright (c) 2026 z1ad - MIT License
+;@Ahk2Exe-SetMainIcon PenBar.ico
+
+PENBAR_VERSION := "1.0.0"
+PENBAR_URL     := "https://github.com/z1ad/PenBar"
+A_IconTip := "PenBar " PENBAR_VERSION
+if !A_IsCompiled && FileExist(A_ScriptDir "\PenBar.ico")
+    TraySetIcon(A_ScriptDir "\PenBar.ico")
 InstallKeybdHook()
 CoordMode("Caret", "Screen")
 
 ; ---- settings -------------------------------------------------------------
-iniFile   := A_ScriptDir "\PenBar.ini"
+; Script: settings next to PenBar.ahk. Compiled .exe (e.g. installed by
+; winget into a read-only or versioned folder): settings in %APPDATA%\PenBar.
+if A_IsCompiled {
+    DirCreate(A_AppData "\PenBar")
+    iniFile := A_AppData "\PenBar\PenBar.ini"
+} else {
+    iniFile := A_ScriptDir "\PenBar.ini"
+}
 mode      := IniRead(iniFile, "Bar", "mode", "float")      ; "float", "right", "top" or "bottom"
 barX      := IniRead(iniFile, "Bar", "x", "")
 barY      := IniRead(iniFile, "Bar", "y", "")
@@ -88,7 +108,9 @@ OnExit(SaveAll)
 ; start so it always points at wherever PenBar.ahk lives now.
 UpdateStartup() {
     try {
-        if startup
+        if startup && A_IsCompiled
+            FileCreateShortcut(A_ScriptFullPath, STARTUP_LNK, A_ScriptDir, , "PenBar pen toolbar")
+        else if startup
             FileCreateShortcut(A_AhkPath, STARTUP_LNK, A_ScriptDir, '"' A_ScriptFullPath '"', "PenBar pen toolbar")
         else if FileExist(STARTUP_LNK)
             FileDelete(STARTUP_LNK)
@@ -837,6 +859,8 @@ BuildTrayMenu() {
         delayMenu.Add(name, SetDelayFn(ms))
     tm.Add("Type text after a pause of", delayMenu)
     tm.Add("Reset bar and pad positions", ResetPositions)
+    tm.Add()
+    tm.Add("About PenBar " PENBAR_VERSION " (GitHub)", (*) => Run(PENBAR_URL))
     UpdateTrayChecks()
 }
 

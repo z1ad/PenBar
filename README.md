@@ -1,3 +1,5 @@
+<img src="assets/icon.png" width="72" align="right" alt="PenBar icon">
+
 # PenBar
 
 A free floating pen toolbar and handwriting pad for Windows 11 tablets and
@@ -6,6 +8,28 @@ Windows pen device. Written in [AutoHotkey v2](https://www.autohotkey.com).
 
 The bar and pad never take focus, so every button acts on the app you are
 using.
+
+**[Download PenBar.exe](https://github.com/z1ad/PenBar/releases/latest)** ·
+`winget install z1ad.PenBar` · [Report a problem](https://github.com/z1ad/PenBar/issues)
+
+## Why PenBar?
+
+Windows 11 has pen support, but using a 2-in-1 with only the pen is still
+awkward:
+
+- **Undo is all-or-nothing.** Text from Windows' handwriting panel goes in as
+  one block, so Ctrl+Z often wipes out everything you wrote. PenBar undoes
+  handwriting **one word at a time**, and Redo puts the word back.
+- **Your palm gets in the way.** Resting your hand on the screen can stop the
+  pen from writing. PenBar's pad listens to the pen only.
+- **No undo, copy, paste or tab without a keyboard.** PenBar puts them one tap
+  away, plus Last App, Task View and Screenshot.
+- **Switching between keyboard and handwriting takes several taps.** PenBar
+  has one button for each, and they show whether they're open.
+- **It stays out of the way.** It docks to any screen edge, minimizes itself
+  when the keyboard is attached, and never steals focus from your app.
+
+It's free, open source (MIT), runs offline, and needs no account.
 
 ## Features
 
@@ -32,6 +56,30 @@ using.
 
 ## Install
 
+### Option 1: the ready-to-run app (easiest)
+
+No other software needed.
+
+- **winget** (built into Windows 11). Open Terminal and run:
+
+  ```powershell
+  winget install z1ad.PenBar
+  ```
+
+  Then start it by typing `PenBar` in Terminal or the Run box (Win+R).
+
+- **Or download** `PenBar.exe` from the
+  [latest release](https://github.com/z1ad/PenBar/releases/latest), put it in
+  a permanent folder, and double-click it.
+
+The app isn't code-signed yet, so Windows may show **"Windows protected your
+PC"** the first time. Choose **More info → Run anyway**. The app's settings
+are saved in `%APPDATA%\PenBar\PenBar.ini`.
+
+### Option 2: run the script with AutoHotkey
+
+Use this if you want to read or change the code.
+
 1. **Install AutoHotkey v2.** Open PowerShell or Terminal and run:
 
    ```powershell
@@ -50,7 +98,7 @@ using.
    Put the folder somewhere permanent, such as `Documents\PenBar`. The
    start-with-Windows shortcut points at wherever the script lives.
 
-## Run
+## Run the script
 
 - Double-click `PenBar.ahk`, or run it from PowerShell:
 
@@ -97,7 +145,8 @@ pad.
 - How long a pause types the text (0.6 to 2 seconds)
 - Reset the bar and pad positions
 
-Settings and positions are saved in `PenBar.ini` next to the script.
+Settings and positions are saved in `PenBar.ini` next to the script (or in
+`%APPDATA%\PenBar` for the app).
 
 ## Optional Windows settings
 
@@ -117,12 +166,24 @@ Setting names can differ slightly between Windows 11 versions.
 ## Uninstall
 
 1. In the tray menu, untick **Start with Windows**, then choose **Exit**.
-2. Delete the PenBar folder.
-3. Optionally uninstall AutoHotkey:
+2. Remove PenBar:
+   - installed with winget: `winget uninstall z1ad.PenBar`
+   - downloaded or script version: delete the PenBar folder
+3. Optionally delete the settings folder `%APPDATA%\PenBar`, and uninstall
+   AutoHotkey if you installed it for the script:
 
    ```powershell
    winget uninstall --id AutoHotkey.AutoHotkey --exact
    ```
+
+## Building the app
+
+```powershell
+& "$env:LOCALAPPDATA\Programs\AutoHotkey\Compiler\Ahk2Exe.exe" /in PenBar.ahk /out dist\PenBar.exe /base "$env:LOCALAPPDATA\Programs\AutoHotkey\v2\AutoHotkey64.exe"
+```
+
+The version, icon and file details come from the `;@Ahk2Exe-` lines at the
+top of `PenBar.ahk`.
 
 ## License
 
