@@ -4,7 +4,8 @@
 ; The bar and pad never take focus, so everything goes to the app you are in.
 ;   Write      opens the handwriting pad. Write, pause, and the words are typed
 ;              into your app. Tap a suggestion at the top to fix a misread word.
-;              Only the pen writes on the pad; palm and finger touches are ignored.
+;              Palm Rejection (on by default): only the pen writes on the pad and
+;              palm/finger touches are ignored. Turn it off to write with a finger.
 ;   Undo       removes the last word written on the pad (not the whole text).
 ;              For other text it sends the app's normal Ctrl+Z.
 ;   Redo       puts back the last word you undid.
@@ -41,14 +42,10 @@ IC := Map("move", 0xE7C2, "hide", 0xE70E, "show", 0xE70D, "write", 0xE76D,
           "undo", 0xE7A7, "redo", 0xE7A6, "tab", 0xE7FD, "copy", 0xE8C8,
           "paste", 0xE77F, "back", 0xE750, "enter", 0xE751, "switch", 0xE8AB,
           "tasks", 0xE7C4, "keyboard", 0xE765, "dock", 0xE90D, "space", 0xE75D,
-          "clear", 0xE74D, "close", 0xE894, "screenshot", 0xE722)
+          "clear", 0xE74D, "close", 0xE894, "screenshot", 0xE722, "palm", 0xEDA4)
 ACTIVE := "0F6CBD"              ; background of a button that is switched on
 
-; Windows pop-ups switched off while PenBar runs (restored on exit).
-; Same values Settings > Typing > Touch keyboard > "Never" writes.
-POPUP_KEY  := "HKCU\Software\Microsoft\TabletTip\1.7"
-POPUP_VALS := ["TouchKeyboardTapInvoke", "EnableDesktopModePenAutoInvoke"]
-hidePopups := Integer(IniRead(iniFile, "Popups", "hide", 1))
+palmReject := Integer(IniRead(iniFile, "Pad", "palmRejection", 1))
 autoMin    := Integer(IniRead(iniFile, "Bar", "autoMinimize", 1))
 startup    := Integer(IniRead(iniFile, "General", "startWithWindows", 1))
 STARTUP_LNK := A_Startup "\PenBar.lnk"
@@ -67,10 +64,8 @@ histWin := 0, histTick := 0, histCaret := ""
 strokes := [], curStroke := 0, penId := 0, mouseInk := false
 inkDC := 0, inkPen := 0, writeRect := {l: 0, t: 0, r: 0, b: 0}, recognizing := false
 
-writeBtn := 0, kbBtn := 0, collapseBtn := 0, inputPane := 0
+writeBtn := 0, kbBtn := 0, collapseBtn := 0, palmBtn := 0, inputPane := 0
 
-if hidePopups
-    SuppressPopups()
 UpdateStartup()
 BuildBar()
 BuildTrayMenu()
@@ -88,41 +83,6 @@ OnMessage(0x200, OnMouse)              ; WM_MOUSEMOVE   (mouse can write too)
 OnMessage(0x201, OnMouse)              ; WM_LBUTTONDOWN
 OnMessage(0x202, OnMouse)              ; WM_LBUTTONUP
 OnExit(SaveAll)
-OnExit((*) => RestorePopups())
-
-; ============================================================================
-; Windows pop-ups (touch keyboard auto-show) - off only while PenBar runs
-; ============================================================================
-
-SuppressPopups() {
-    ; Remember the user's own values once. If PenBar was killed last time,
-    ; "active" is still 1 and the saved originals are kept.
-    if !Integer(IniRead(iniFile, "Popups", "active", 0)) {
-        for name in POPUP_VALS {
-            orig := "<none>"
-            try orig := RegRead(POPUP_KEY, name)
-            IniWrite(orig, iniFile, "Popups", name)
-        }
-        IniWrite(1, iniFile, "Popups", "active")
-    }
-    for name in POPUP_VALS
-        try RegWrite(0, "REG_DWORD", POPUP_KEY, name)
-}
-
-RestorePopups() {
-    if !Integer(IniRead(iniFile, "Popups", "active", 0))
-        return
-    for name in POPUP_VALS {
-        orig := IniRead(iniFile, "Popups", name, "<none>")
-        try {
-            if orig = "<none>"
-                RegDelete(POPUP_KEY, name)
-            else
-                RegWrite(orig, "REG_DWORD", POPUP_KEY, name)
-        }
-    }
-    IniWrite(0, iniFile, "Popups", "active")
-}
 
 ; Start with Windows: a shortcut in the Startup folder. Rewritten on every
 ; start so it always points at wherever PenBar.ahk lives now.
@@ -146,11 +106,10 @@ ToggleAutoMin(*) {
     IniWrite(autoMin, iniFile, "Bar", "autoMinimize"), UpdateTrayChecks()
 }
 
-TogglePopups(*) {
-    global hidePopups := !hidePopups
-    IniWrite(hidePopups, iniFile, "Popups", "hide")
-    hidePopups ? SuppressPopups() : RestorePopups()
-    UpdateTrayChecks()
+TogglePalm(*) {
+    global palmReject := !palmReject
+    IniWrite(palmReject, iniFile, "Pad", "palmRejection")
+    SetActive(palmBtn, palmReject)
 }
 
 ; ============================================================================
@@ -407,7 +366,7 @@ KeyboardButton(*) {
 }
 
 BuildPad() {
-    global pad, padGrip, altBtns, writeRect, inkPen, BTN_H
+    global pad, padGrip, altBtns, writeRect, inkPen, BTN_H, palmBtn
     barH := BTN_H, BTN_H := 44
     pad := Gui("+AlwaysOnTop -Caption +ToolWindow +E0x08000000 +Border", "PenBar Pad")
     pad.BackColor := "FFFFFF"
@@ -426,6 +385,8 @@ BuildPad() {
     ; Backspace / Enter / Undo live on the bar; the pad keeps only its own tools.
     MakeButton(pad, "space", "Space",     "x+12 yp", 50, SpaceKey)
     MakeButton(pad, "clear", "Clear Ink", "x+4 yp",  66, (*) => (SetTimer(DoRecognize, 0), DiscardInk()))
+    palmBtn := MakeButton(pad, "palm", "Palm Rejection", "x+12 yp", 100, TogglePalm)
+    SetActive(palmBtn, palmReject)
     MakeButton(pad, "close", "",          "x+4 yp",  0,  (*) => TogglePad())
 
     pad.Show("Hide AutoSize")
@@ -467,9 +428,9 @@ OnPointer(wParam, lParam, msg, hwnd) {
         return
     id := wParam & 0xFFFF
     t := PointerType(id)
-    if t = 2
-        return 0                ; ignore palm / finger touches on the pad
-    if t != 3
+    if t = 2 && palmReject
+        return 0                ; palm rejection: ignore palm / finger touches
+    if t != 3 && t != 2
         return
     if msg = 0x246 {            ; pen down
         p := ScreenToPad(lParam)
@@ -869,7 +830,6 @@ BuildTrayMenu() {
     tm.Add()
     tm.Add("Add a space after each word", ToggleAutoSpace)
     tm.Add("Undo outside the pad deletes last word (not Ctrl+Z)", ToggleUndoWord)
-    tm.Add("Stop Windows touch keyboard popping up while PenBar runs", TogglePopups)
     tm.Add("Minimize bar when the keyboard is attached", ToggleAutoMin)
     tm.Add("Start with Windows", ToggleStartup)
     delayMenu := Menu()
@@ -893,8 +853,6 @@ UpdateTrayChecks() {
     autoSpace ? tm.Check("Add a space after each word") : tm.Uncheck("Add a space after each word")
     undoWord ? tm.Check("Undo outside the pad deletes last word (not Ctrl+Z)")
              : tm.Uncheck("Undo outside the pad deletes last word (not Ctrl+Z)")
-    hidePopups ? tm.Check("Stop Windows touch keyboard popping up while PenBar runs")
-               : tm.Uncheck("Stop Windows touch keyboard popping up while PenBar runs")
     for ms, name in DELAYS
         (delayMs = ms) ? delayMenu.Check(name) : delayMenu.Uncheck(name)
 }
