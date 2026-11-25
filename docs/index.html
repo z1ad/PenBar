@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PenBar – pen toolbar and handwriting pad for Windows tablets</title>
+<meta name="description" content="Free, open-source floating pen toolbar and handwriting pad for Windows 11 tablets and 2-in-1s. Word-by-word undo, palm rejection, docking.">
+<meta property="og:title" content="PenBar – pen toolbar and handwriting pad for Windows tablets">
+<meta property="og:description" content="Free, open-source pen toolbar and handwriting pad for Windows 11 tablets and 2-in-1s.">
+<meta property="og:image" content="https://z1ad.github.io/PenBar/screenshot-pad.png">
+<link rel="icon" href="favicon.ico">
+<style>
+  :root {
+    --bg: #ffffff; --fg: #1b1b1f; --muted: #5c5f66; --card: #f3f5f8;
+    --border: #dde1e7; --accent: #0f6cbd; --accent-fg: #ffffff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #141518; --fg: #ececf0; --muted: #a3a7b0; --card: #1e2025;
+      --border: #30333a; --accent: #4aa3f0; --accent-fg: #0b1220;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--fg);
+    font: 17px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+  main { max-width: 920px; margin: 0 auto; padding: 48px 16px 64px; }
+  header { display: flex; align-items: center; gap: 16px; }
+  header img { width: 64px; height: 64px; }
+  h1 { font-size: 2.4rem; line-height: 1.1; margin: 0; }
+  .tagline { color: var(--muted); margin: 4px 0 0; font-size: 1.1rem; }
+  .actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 8px; }
+  .btn {
+    display: inline-block; padding: 12px 22px; border-radius: 8px;
+    font-weight: 600; text-decoration: none; border: 1px solid var(--border); color: var(--fg);
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+  .btn:hover { filter: brightness(1.08); }
+  .small { color: var(--muted); font-size: 0.9rem; }
+  code {
+    background: var(--card); border: 1px solid var(--border); border-radius: 6px;
+    padding: 2px 7px; font: 0.95em Consolas, ui-monospace, monospace;
+  }
+  .demo {
+    margin: 32px 0; border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; background: var(--card);
+  }
+  .demo img { display: block; width: 100%; height: auto; }
+  h2 { font-size: 1.5rem; margin: 40px 0 12px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; }
+  .card h3 { margin: 0 0 4px; font-size: 1.05rem; }
+  .card p { margin: 0; color: var(--muted); font-size: 0.95rem; }
+  ol { padding-left: 22px; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 0.9rem; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="icon.png" alt="">
+    <div>
+      <h1>PenBar</h1>
+      <p class="tagline">A free pen toolbar and handwriting pad for Windows 11 tablets and 2-in-1s.</p>
+    </div>
+  </header>
+
+  <div class="actions">
+    <a class="btn primary" href="https://github.com/z1ad/PenBar/releases/latest/download/PenBar.exe"
+       data-goatcounter-click="download-exe" data-goatcounter-title="Download PenBar.exe">Download PenBar.exe</a>
+    <a class="btn" href="https://github.com/z1ad/PenBar"
+       data-goatcounter-click="github" data-goatcounter-title="View on GitHub">View on GitHub</a>
+  </div>
+  <p class="small">Version 1.0.0 · single .exe, no installer · free and open source (MIT) ·
+    or with winget: <code>winget install z1ad.PenBar</code></p>
+
+  <div class="demo">
+    <img src="demo.gif" width="960" height="516"
+         alt="Writing “Hello world” on the PenBar pad; Undo removes only “world”, Redo brings it back">
+  </div>
+
+  <h2>Why PenBar?</h2>
+  <div class="grid">
+    <div class="card"><h3>Undo one word at a time</h3>
+      <p>Handwriting is undone word by word, instead of Ctrl+Z wiping out everything you wrote.</p></div>
+    <div class="card"><h3>Palm rejection</h3>
+      <p>Rest your hand on the screen. The pad only listens to the pen (and you can switch that off).</p></div>
+    <div class="card"><h3>No keyboard needed</h3>
+      <p>One tap for Undo, Redo, Copy, Paste, Backspace, Tab, Enter, Last App, Task View and Screenshot.</p></div>
+    <div class="card"><h3>Stays out of the way</h3>
+      <p>Docks to any screen edge, minimizes when the keyboard is attached, and never steals focus.</p></div>
+    <div class="card"><h3>Private and offline</h3>
+      <p>Uses Windows' own handwriting recognizer. No account, no cloud, no data leaves your PC.</p></div>
+    <div class="card"><h3>Free and open source</h3>
+      <p>MIT licensed. Read the code, change it, share it.</p></div>
+  </div>
+
+  <h2>Get started</h2>
+  <ol>
+    <li><a href="https://github.com/z1ad/PenBar/releases/latest/download/PenBar.exe"
+           data-goatcounter-click="download-exe-steps" data-goatcounter-title="Download PenBar.exe (steps)">Download PenBar.exe</a>
+      and put it in a permanent folder.</li>
+    <li>Double-click it. If Windows shows “Windows protected your PC”, choose <strong>More info → Run anyway</strong>
+      (the app isn't code-signed yet).</li>
+    <li>Tap <strong>Write</strong> and start writing. More options are in the tray icon menu.</li>
+  </ol>
+  <p class="small">Made for Windows 11 pen and touch devices. Questions or ideas?
+    <a href="https://github.com/z1ad/PenBar/issues" data-goatcounter-click="issues">Open an issue</a>.</p>
+
+  <footer>PenBar is made by z1ad and released under the MIT License.</footer>
+</main>
+<script data-goatcounter="https://z1ad.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

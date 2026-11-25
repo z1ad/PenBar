@@ -10,7 +10,10 @@ The bar and pad never take focus, so every button acts on the app you are
 using.
 
 **[Download PenBar.exe](https://github.com/z1ad/PenBar/releases/latest)** ·
-`winget install z1ad.PenBar` · [Report a problem](https://github.com/z1ad/PenBar/issues)
+`winget install z1ad.PenBar` · [Website](https://z1ad.github.io/PenBar/) ·
+[Report a problem](https://github.com/z1ad/PenBar/issues)
+
+![PenBar demo: writing "Hello world" on the pad, then Undo removes only "world" and Redo brings it back](assets/demo.gif)
 
 ## Why PenBar?
 
@@ -53,6 +56,12 @@ It's free, open source (MIT), runs offline, and needs no account.
 - **Auto-minimize**: the bar shrinks to a small tab when the keyboard is
   attached, and expands when you fold the screen back into tablet mode.
 - **Start with Windows** (on by default, can be turned off).
+
+## Screenshots
+
+| Docked on the right, with the handwriting pad | Docked on the top edge |
+|---|---|
+| ![PenBar docked on the right edge with the handwriting pad open](assets/screenshot-pad.png) | ![PenBar docked along the top edge](assets/screenshot-top.png) |
 
 ## Install
 
