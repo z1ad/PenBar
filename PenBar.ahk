@@ -20,7 +20,7 @@
 
 ;@Ahk2Exe-SetName PenBar
 ;@Ahk2Exe-SetProductName PenBar
-;@Ahk2Exe-SetDescription PenBar - pen toolbar, handwriting pad and keyboard
+;@Ahk2Exe-SetDescription PenBar - pen toolbar with handwriting pad and keyboard
 ;@Ahk2Exe-SetVersion 1.1.0
 ;@Ahk2Exe-SetCopyright Copyright (c) 2026 z1ad - MIT License
 ;@Ahk2Exe-SetMainIcon PenBar.ico
@@ -848,7 +848,9 @@ StartDictation() {
     global dictPid
     if !dictPid || !ProcessExist(dictPid) {
         if A_IsCompiled {
-            try FileInstall("dictate.ps1", A_AppData "\PenBar\dictate.ps1", 1)
+            try {                         ; FileInstall starts its line so Ahk2Exe bundles the file
+                FileInstall("dictate.ps1", A_AppData "\PenBar\dictate.ps1", 1)
+            }
             script := A_AppData "\PenBar\dictate.ps1"
         } else {
             script := A_ScriptDir "\dictate.ps1"
@@ -1862,7 +1864,9 @@ TypeChar(c) {
 
 LoadWords() {
     if A_IsCompiled {
-        try FileInstall("words.txt", A_AppData "\PenBar\words.txt", 1)
+        try {                             ; FileInstall starts its line so Ahk2Exe bundles the file
+            FileInstall("words.txt", A_AppData "\PenBar\words.txt", 1)
+        }
         path := A_AppData "\PenBar\words.txt"
     } else {
         path := A_ScriptDir "\words.txt"
